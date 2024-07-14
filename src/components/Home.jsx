@@ -27,7 +27,7 @@ function Home() {
   return (
     <div className="bg-black text-white flex flex-col items-center min-h-screen">
       <div className="flex flex-col items-center w-full">
-        <h1 className="text-4xl mb-8">Welcome to Movie App</h1>
+        <h1 className="text-4xl mb-8">Search Your Favourite Movie</h1>
         <div className="w-full max-w-md">
           <SearchBar 
             searchMovies={searchMovies} 
