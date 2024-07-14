@@ -8,7 +8,7 @@ const AppBar = () => {
 
   const handleNavigation = (type) => {
     navigate(`/movies/${type}`);
-    setMenuOpen(false); // Close the menu on navigation
+    setMenuOpen(false); 
   };
 
   const toggleMenu = () => {
@@ -19,7 +19,7 @@ const AppBar = () => {
     <nav className="bg-black p-4 flex justify-between items-center">
       <div className="flex items-center space-x-10">
         <button onClick={() => navigate("/")}>
-          <img src="src/images/logo.jpg" className="w-16" alt="Logo" />
+          <h2 className="text-black-800">Flim Shpere</h2>
         </button>
         <div className="hidden md:flex space-x-4 text-lg">
           <button onClick={() => navigate("/")}>Home</button>
