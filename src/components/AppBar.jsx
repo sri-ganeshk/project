@@ -8,7 +8,7 @@ const AppBar = () => {
 
   const handleNavigation = (type) => {
     navigate(`/movies/${type}`);
-    setMenuOpen(false); // Close the menu on navigation
+    setMenuOpen(false); 
   };
 
   const toggleMenu = () => {
