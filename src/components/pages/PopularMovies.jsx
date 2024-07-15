@@ -1,4 +1,3 @@
-// src/components/pages/PopularMovies.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import MovieCard from '../MovieCard';
