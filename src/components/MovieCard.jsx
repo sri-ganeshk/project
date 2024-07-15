@@ -13,7 +13,7 @@ const MovieCard = ({ movie }) => {
         const response = await axios.get(`https://api.themoviedb.org/3/movie/${movie.id}`, {
           params: {
             api_key: apiKey,
-            append_to_response: 'credits', // Append credits to the movie details request
+            append_to_response: 'credits',
           },
         });
         setMovieDetails(response.data);
@@ -28,7 +28,7 @@ const MovieCard = ({ movie }) => {
   }, [movie.id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div></div>;
   }
 
   if (error) {
