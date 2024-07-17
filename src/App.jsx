@@ -9,6 +9,7 @@ import Home from './components/Home';
 import Popular from './components/pages/PopularMovies';
 import TopRatedMovies from './components/pages/TopRated';
 import UpcomingMovies from './components/pages/UpcomingMovies';
+import Movie from './components/Movie';
 function App() {
   return (
     <div>
@@ -18,7 +19,7 @@ function App() {
         <Routes >
           
           <Route path="/" element={<Home />} />
-          <Route path='/movie/:id' element={ <p>single movie</p>}></Route>
+          <Route path='/movie/:id' element={ <Movie/>}></Route>
           <Route path='/movies/popular' element={ <Popular/>}></Route>
           <Route path='/movies/top-rated' element={ <TopRatedMovies/>}></Route>
           <Route path='/movies/upcoming-movies'element={<UpcomingMovies/>}></Route>

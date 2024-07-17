@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 
 const MovieCard = ({ movie }) => {
   const [movieDetails, setMovieDetails] = useState(null);
@@ -43,6 +44,7 @@ const MovieCard = ({ movie }) => {
       className="bg-black text-white p-4 rounded-lg shadow-lg m-4 transition transform hover:scale-105"
       style={{ maxWidth: '300px' }}
     >
+      <Link to={`/movie/${movie.id}`} >
       <h2 className="bg-red-900 p-2 rounded-t-lg text-lg font-bold">{movie.title}</h2>
       <p className="mt-2 text-sm">Release Date: {movie.release_date}</p>
       <p className="mt-1 text-sm">Rating: {movieDetails.vote_average}</p>
@@ -52,6 +54,7 @@ const MovieCard = ({ movie }) => {
         alt={movie.title}
         className="w-full h-auto rounded-b-lg mt-4"
       />
+      </Link>
     </div>
   );
 };
