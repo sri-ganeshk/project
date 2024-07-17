@@ -7,25 +7,22 @@ const Movie = () => {
   const [movieDetails, setMovieDetails] = useState(null);
 
   useEffect(() => {
-    const movieInfo = async () => {
-      const apiKey = '1bf5ead9bb0ad708a1b4daa0e93f9b33';
-      //https://api.themoviedb.org/3/movie/
-
-      axios.get(`https://api.themoviedb.org/3/movie/${id}`, {
-        params: {
-          api_key: apiKey,
-          append_to_response: 'credits',
-        },
-      })
-      .then(response => {
+    const fetchMovieDetails = async () => {
+      try {
+        const apiKey = '1bf5ead9bb0ad708a1b4daa0e93f9b33';
+        const response = await axios.get(`https://api.themoviedb.org/3/movie/${id}`, {
+          params: {
+            api_key: apiKey,
+            append_to_response: 'credits,watch/providers',
+          },
+        });
         setMovieDetails(response.data);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('Error fetching movie details:', err);
-      });
+      }
     };
 
-    movieInfo();
+    fetchMovieDetails();
   }, [id]);
 
   if (!movieDetails) {
@@ -33,24 +30,24 @@ const Movie = () => {
   }
 
   const director = movieDetails.credits.crew.find(person => person.job === 'Director');
+  const cast = movieDetails.credits.cast.slice(0, 5); // Display top 5 cast members
+  const providers = movieDetails['watch/providers'].results.US; // Assume US region for watch providers
 
   return (
     <div className="p-4 text-white">
       <div
-        className="relative bg-cover bg-center rounded-lg p-4 h-[400px] md:h-[500px] lg:h-[600px] xl:h-[700px]"
+        className="bg-cover bg-center rounded-lg p-4"
         style={{
           backgroundImage: `url(https://image.tmdb.org/t/p/w1280${movieDetails.backdrop_path})`,
         }}
       >
-        <div className="absolute inset-0 bg-black bg-opacity-60 rounded-lg" />
-        <div className="relative z-10 p-4">
+        <div className="bg-black bg-opacity-60 p-4 rounded-lg">
           <h1 className="text-2xl font-bold">{movieDetails.title}</h1>
           <p className="mt-2">Release Date: {movieDetails.release_date}</p>
           <p className="mt-2">Rating: {movieDetails.vote_average}</p>
           {director && <p className="mt-2">Director: {director.name}</p>}
-          
-          <h2 className="mt-4 text-lg font-semibold">Description:</h2>
-          <p className="mt-2">{movieDetails.overview}</p>
+          <p className="mt-2">Overview: {movieDetails.overview}</p>
+
         </div>
       </div>
     </div>

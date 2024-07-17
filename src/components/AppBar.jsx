@@ -21,9 +21,9 @@ const AppBar = () => {
 
   return (
     <nav className="bg-black p-4 flex justify-between items-center relative">
-      <div className="flex items-center space-x-10">
+      <div className="flex items-center space-x-4 md:space-x-10">
         <button onClick={() => navigate("/")}>
-          <h2 className="text-white">Flim Sphere</h2>
+          <h2 className="text-white text-xl md:text-2xl">Film Sphere</h2>
         </button>
         <div className="hidden md:flex space-x-4 text-lg">
           <button className="text-white" onClick={() => navigate("/")}>Home</button>
