@@ -30,9 +30,6 @@ const Movie = () => {
   }
 
   const director = movieDetails.credits.crew.find(person => person.job === 'Director');
-  const cast = movieDetails.credits.cast.slice(0, 5); // Display top 5 cast members
-  const providers = movieDetails['watch/providers'].results.US; // Assume US region for watch providers
-
   return (
     <div className="p-4 text-white">
       <div
