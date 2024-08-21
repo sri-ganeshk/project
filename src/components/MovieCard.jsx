@@ -29,32 +29,36 @@ const MovieCard = ({ movie }) => {
   }, [movie.id]);
 
   if (loading) {
-    return <div></div>;
+    return <div>Loading...</div>;
   }
 
   if (error) {
     return <div>Error fetching movie details</div>;
   }
 
-  const director = movieDetails.credits.crew.find(person => person.job === 'Director');
+  const ratingColor = () => {
+    if (movieDetails.vote_average >= 7) return 'bg-green-600';
+    if (movieDetails.vote_average >= 5) return 'bg-yellow-600';
+    return 'bg-red-600';
+  };
 
   return (
-    <div
-      key={movie.id}
-      className="bg-black text-white p-4 rounded-lg shadow-lg m-4 transition transform hover:scale-105"
-      style={{ maxWidth: '300px' }}
-    >
-      <Link to={`/movie/${movie.id}`} >
-      <h2 className="bg-red-900 p-2 rounded-t-lg text-lg font-bold">{movie.title}</h2>
-      <p className="mt-2 text-sm">Release Date: {movie.release_date}</p>
-      <p className="mt-1 text-sm">Rating: {movieDetails.vote_average}</p>
-      {director && <p className="mt-1 text-sm">Director: {director.name}</p>}
-      <img
-        src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-        alt={movie.title}
-        className="w-full h-auto rounded-b-lg mt-4"
-      />
+    <div className="relative h-full w-full bg-black/30 flex justify-center items-center p-4 rounded-lg shadow-lg m-4 transition transform hover:scale-105">
+      <Link to={`/movie/${movie.id}`} className="flex flex-col items-center">
+        <img
+          src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+          alt={movie.title}
+          className="rounded-lg shadow-lg w-full h-auto"
+        />
+        <div className="text-white text-center mt-4">
+          <h2 className="text-lg font-bold">{movie.title}</h2>
+        </div>
       </Link>
+      <div
+        className={`absolute top-2 right-2 text-white font-bold text-sm w-8 h-8 flex justify-center items-center rounded-full ${ratingColor()}`}
+      >
+        {movieDetails.vote_average.toFixed(1)}
+      </div>
     </div>
   );
 };
