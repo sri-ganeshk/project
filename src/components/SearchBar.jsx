@@ -22,3 +22,4 @@ const SearchBar = ({ searchMovies, setSearchMovies, onSearch }) => {
     </form>
   );
 };
+export default SearchBar;
