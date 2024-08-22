@@ -29,7 +29,7 @@ const MovieCard = ({ movie }) => {
   }, [movie.id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div> </div>;
   }
 
   if (error) {
