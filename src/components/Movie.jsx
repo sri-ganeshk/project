@@ -5,6 +5,7 @@ import axios from 'axios';
 const Movie = () => {
   const { id } = useParams();
   const [movieDetails, setMovieDetails] = useState(null);
+  const [recommendations, setRecommendations] = useState([]);
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -17,6 +18,12 @@ const Movie = () => {
           },
         });
         setMovieDetails(response.data);
+
+        // Fetch recommendations
+        const recommendationsResponse = await axios.get(`https://api.themoviedb.org/3/movie/${id}/recommendations`, {
+          params: { api_key: apiKey },
+        });
+        setRecommendations(recommendationsResponse.data.results);
       } catch (err) {
         console.error('Error fetching movie details:', err);
       }
@@ -30,8 +37,15 @@ const Movie = () => {
   }
 
   const director = movieDetails.credits.crew.find(person => person.job === 'Director');
-  const cast = movieDetails.credits.cast; // Display top 5 cast members
+  const cast = movieDetails.credits.cast;
   const trailer = movieDetails.videos.results.find(video => video.type === 'Trailer');
+
+  const getWikipediaLink = (name) => {
+    const formattedName = name.split(' ').join('_');
+    return `https://en.wikipedia.org/wiki/${formattedName}`;
+  };
+
+  const fallbackImage = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png';
 
   return (
     <div className="md:ml-0">
@@ -69,21 +83,38 @@ const Movie = () => {
       </div>
 
       <div className="flex flex-col items-center">
+        <h1 className="text-3xl text-blue-300 font-semibold text-center p-2">Director</h1>
+        {director && (
+          <div className="text-white text-center my-3">
+            <a
+              href={getWikipediaLink(director.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {director.name}
+            </a>
+          </div>
+        )}
+
         <h1 className="text-3xl text-blue-300 font-semibold text-center p-2">Cast</h1>
         <div className="md:px-5 flex flex-row my-5 max-w-full flex-start overflow-x-auto relative scrollbar-thin scrollbar-thumb-gray-500/20 scrollbar-track-gray-900/90 md:pb-3">
           {cast.map((member) => (
-            <div
+            <a
               key={member.cast_id}
-              className="flex min-w-[9rem] md:min-w-[10rem] max-w-[9rem] md:max-w-[10rem] h-full items-center text-center flex-col mx-1"
+              href={getWikipediaLink(member.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex min-w-[9rem] md:min-w-[10rem] max-w-[9rem] md:max-w-[10rem] h-full items-center text-center flex-col mx-1 cursor-pointer"
             >
               <img
                 src={`https://image.tmdb.org/t/p/w500${member.profile_path}`}
                 alt={member.name}
-                className="w-full h-full rounded-xl"
+                onError={(e) => { e.target.src = fallbackImage; }}
+                className="w-full h-[14rem] object-cover rounded-xl transition-transform duration-300 ease-in-out transform hover:scale-105"
               />
-              <p className="text-white">{member.name}</p>
+              <p className="text-white mt-2">{member.name}</p>
               <p className="text-blue-300">({member.character})</p>
-            </div>
+            </a>
           ))}
         </div>
       </div>
@@ -127,6 +158,31 @@ const Movie = () => {
           </svg>
           Watch Movie
         </a>
+      </div>
+
+      <div className="my-10">
+        <h1 className="text-3xl text-blue-300 font-semibold text-center p-2">Recommended Movies</h1>
+        <div className="md:px-5 flex flex-row my-5 max-w-full flex-start overflow-x-auto relative scrollbar-thin scrollbar-thumb-gray-500/20 scrollbar-track-gray-900/90 md:pb-3">
+          {recommendations.length > 0 ? (
+            recommendations.map((movie) => (
+              <a
+                key={movie.id}
+                href={`/movie/${movie.id}`}
+                className="flex min-w-[9rem] md:min-w-[10rem] max-w-[9rem] md:max-w-[10rem] h-full items-center text-center flex-col mx-1 cursor-pointer"
+              >
+                <img
+                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
+                  alt={movie.title}
+                  onError={(e) => { e.target.src = fallbackImage; }}
+                  className="w-full h-[20rem] max-w-[14rem] object-cover rounded-xl transition-transform duration-300 ease-in-out transform hover:scale-105"
+                />
+                <p className="text-white mt-2">{movie.title}</p>
+              </a>
+            ))
+          ) : (
+            <p className="text-white text-center">No recommendations available.</p>
+          )}
+        </div>
       </div>
     </div>
   );
