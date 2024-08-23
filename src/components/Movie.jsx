@@ -90,8 +90,15 @@ const Movie = () => {
               href={getWikipediaLink(director.name)}
               target="_blank"
               rel="noopener noreferrer"
+              className="flex min-w-[9rem] md:min-w-[10rem] max-w-[9rem] md:max-w-[10rem] h-full items-center text-center flex-col mx-1 cursor-pointer"
             >
-              {director.name}
+              <img
+                src={`https://image.tmdb.org/t/p/w500${director.profile_path}`}
+                alt={director.name}
+                onError={(e) => { e.target.src = fallbackImage; }}
+                className="w-full h-[14rem] object-cover rounded-xl transition-transform duration-300 ease-in-out transform hover:scale-105"
+              />
+              <p className="text-white mt-2">{director.name}</p>
             </a>
           </div>
         )}
