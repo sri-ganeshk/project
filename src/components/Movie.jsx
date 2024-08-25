@@ -39,7 +39,8 @@ const Movie = () => {
   const director = movieDetails.credits.crew.find(person => person.job === 'Director');
   const cast = movieDetails.credits.cast;
   const trailer = movieDetails.videos.results.find(video => video.type === 'Trailer');
-
+  const rating = movieDetails.vote_average; // Get the rating
+  const stars = Math.round(rating / 2); // Convert to a 5-star scale
   const getWikipediaLink = (name) => {
     const formattedName = name.split(' ').join('_');
     return `https://en.wikipedia.org/wiki/${formattedName}`;
@@ -59,6 +60,24 @@ const Movie = () => {
           alt={movieDetails.title}
           className="h-full w-full"
         />
+      </div>
+
+      {/* Movie Rating */}
+      <div className="flex justify-center items-center mt-5">
+        <div className="flex items-center space-x-2">
+          {[...Array(5)].map((_, index) => (
+            <svg
+              key={index}
+              className={`w-6 h-6 ${index < stars ? 'text-yellow-400' : 'text-gray-400'}`}
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M9.049.867L7.527 6.317H2.3L6.18 9.013 4.664 14.567 9.049 11.608 13.436 14.567 11.92 9.013 15.799 6.317h-5.226L9.049.867z" />
+            </svg>
+          ))}
+          <p className="text-white text-lg">{rating.toFixed(1)}/10</p>
+        </div>
       </div>
 
       <h2 className="text-white text-center pt-5 px-3 md:px-60 font-Roboto text-[18px]">
@@ -196,3 +215,4 @@ const Movie = () => {
 };
 
 export default Movie;
+
