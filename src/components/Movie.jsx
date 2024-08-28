@@ -70,7 +70,7 @@ const Movie = () => {
   };
 
   return (
-    <div className="md:ml-0 bg-gray-900 min-h-screen">
+    <div className="md:ml-0 bg-black min-h-screen">
       {/* Movie Banner */}
       <div className="relative h-auto md:h-[82vh] flex justify-center">
         <div className="h-full w-full shadowbackdrop absolute"></div>
@@ -191,80 +191,76 @@ const Movie = () => {
               width="1em"
               xmlns="http://www.w3.org/2000/svg"
             >
-              <path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.9 72.4 41.3l352-208.1c31.7-18.6 31.9-64.2 0-82.5z"></path>
+              <path d="M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.9 72.4 41.3l352-208.2c31.8-18.8 31.7-65.7 0-84.4z"></path>
             </svg>
             Watch Trailer
           </a>
         )}
-        <div className="my-10">
-        <h1 className="text-3xl text-blue-300 font-semibold text-center p-2">Recommended Movies</h1>
-        <div className="md:px-5 flex flex-row my-5 max-w-full flex-start overflow-x-auto relative scrollbar-thin scrollbar-thumb-gray-500/20 scrollbar-track-gray-900/90 md:pb-3">
-          {recommendations.length > 0 ? (
-            recommendations.map((movie) => (
-              <a
-                key={movie.id}
-                href={`/movie/${movie.id}`}
-                className="flex min-w-[9rem] md:min-w-[10rem] max-w-[9rem] md:max-w-[10rem] h-full items-center text-center flex-col mx-1 cursor-pointer"
-              >
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
-                  alt={movie.title}
-                  onError={(e) => { e.target.src = fallbackImage; }}
-                  className="w-full h-[20rem] max-w-[14rem] object-cover rounded-xl transition-transform duration-300 ease-in-out transform hover:scale-105"
-                />
-                <p className="text-white mt-2">{movie.title}</p>
-              </a>
-            ))
-          ) : (
-            <p className="text-white text-center">No recommendations available.</p>
-          )}
-        </div>
-        </div>
         <a
-          href={`https://www.themoviedb.org/movie/${id}`}
+          href={`https://www.themoviedb.org/movie/${movieDetails.id}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex border-2 border-blue-500 bg-blue-500/40 p-3 items-center justify-center gap-2 text-xl font-semibold rounded-full text-white hover:bg-blue-500 transition duration-300"
+          className="flex border-2 border-blue-600 bg-blue-600/30 p-3 items-center justify-center gap-2 text-xl font-semibold rounded-full text-blue-300 hover:bg-blue-600/50 transition duration-300"
         >
-          More Details
+          View on TMDb
         </a>
       </div>
 
-    
-
       {/* Reviews Section */}
-      <div className="pt-5 px-5 md:px-40 lg:px-52 xl:px-80 text-white">
-        <h2 className="text-2xl font-bold mb-4">Reviews</h2>
+      <div className="px-3 md:px-40">
+        <h2 className="text-3xl text-blue-300 font-semibold text-center p-2">Reviews</h2>
         {reviews.slice(0, visibleReviews).map((review) => (
-          <div key={review.id} className="mb-4 p-4 border border-gray-700 rounded-lg">
-            <div className="flex items-center mb-2">
+          <div key={review.id} className="bg-gray-800 p-4 mb-4 rounded-lg">
+            <div className="flex items-center">
               <img
                 src={getAvatarUrl(review.author_details.avatar_path)}
                 alt={review.author}
                 className="w-12 h-12 rounded-full mr-4"
               />
               <div>
-                <h3 className="text-lg font-semibold">{review.author}</h3>
-                <p className="text-sm text-gray-400">{new Date(review.created_at).toLocaleDateString()}</p>
+                <h3 className="text-white font-semibold">{review.author}</h3>
+                <p className="text-gray-400 text-sm">
+                  {new Date(review.created_at).toLocaleDateString()}
+                </p>
               </div>
             </div>
-            <p>{review.content}</p>
+            <p className="text-white mt-4">{review.content}</p>
           </div>
         ))}
         {visibleReviews < reviews.length && (
-          <button
-            onClick={handleReadMore}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full"
-          >
-            Read More Reviews
-          </button>
+          <div className="flex justify-center">
+            <button
+              className="bg-blue-600 text-white py-2 px-4 rounded-full"
+              onClick={handleReadMore}
+            >
+              Load More Reviews
+            </button>
+          </div>
         )}
+      </div>
 
-        
+      {/* Recommendations Section */}
+      <div className="px-3 md:px-40">
+        <h2 className="text-3xl text-blue-300 font-semibold text-center p-2">Recommendations</h2>
+        <div className="md:px-5 flex flex-row my-5 max-w-full flex-start overflow-x-auto relative scrollbar-thin scrollbar-thumb-gray-500/20 scrollbar-track-gray-900/90 md:pb-3">
+          {recommendations.map((recommendation) => (
+            <a
+              key={recommendation.id}
+              href={`/movie/${recommendation.id}`}
+              className="flex min-w-[9rem] md:min-w-[10rem] max-w-[9rem] md:max-w-[10rem] h-full items-center text-center flex-col mx-1 cursor-pointer"
+            >
+              <img
+                src={`https://image.tmdb.org/t/p/w500${recommendation.poster_path}`}
+                alt={recommendation.title}
+                className="w-full h-[14rem] object-cover rounded-xl transition-transform duration-300 ease-in-out transform hover:scale-105"
+              />
+              <p className="text-white mt-2">{recommendation.title}</p>
+            </a>
+          ))}
+        </div>
       </div>
     </div>
   );
 };
 
 export default Movie;
-
