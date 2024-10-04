@@ -9,9 +9,11 @@ const API = axios.create({
 API.interceptors.request.use((req) => {
     const token = localStorage.getItem('token'); // Get token from localStorage (or however you store it)
     if (token) {
-        req.headers.Authorization = `Bearer ${token}`;
+        req.headers.Authorization = `${token}`;
     }
     return req;
+}, (error) => {
+    return Promise.reject(error);
 });
 
 // Authentication API calls

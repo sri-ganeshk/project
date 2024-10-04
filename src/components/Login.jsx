@@ -22,6 +22,10 @@ const Login = () => {
         }
     };
 
+    const goToRegister = () => {
+        navigate('/register');  // Redirect to the Register page
+    };
+
     return (
         <div className="flex items-center justify-center h-screen bg-gray-900">
             <div className="w-full max-w-sm bg-gray-800 p-8 rounded-lg shadow-md">
@@ -59,10 +63,19 @@ const Login = () => {
                     </div>
                 </form>
                 {error && <p className="mt-4 text-red-500 text-center">{error}</p>}
+                
+                <div className="mt-4 text-center">
+                    <p className="text-gray-300">New user?</p>
+                    <button 
+                        onClick={goToRegister} 
+                        className="mt-2 py-2 px-4 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-md transition-colors duration-300"
+                    >
+                        Register
+                    </button>
+                </div>
             </div>
         </div>
     );
 };
 
 export default Login;
-
