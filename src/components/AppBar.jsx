@@ -30,7 +30,6 @@ const AppBar = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
-  
   };
 
   const toggleDropdown = () => {
@@ -49,6 +48,7 @@ const AppBar = () => {
         <button className="text-white hover:text-gray-400 transition" onClick={() => handleNavigation("popular")}>Popular</button>
         <button className="text-white hover:text-gray-400 transition" onClick={() => handleNavigation("top-rated")}>Top Rated</button>
         <button className="text-white hover:text-gray-400 transition" onClick={() => handleNavigation("upcoming-movies")}>Upcoming</button>
+        <button className="text-white hover:text-gray-400 transition" onClick={() => navigate("/favorites")}>Favorites</button> {/* Added Favorites button */}
         {isLoggedIn ? (
           <div className="relative">
             <img
@@ -83,6 +83,7 @@ const AppBar = () => {
           <button className="text-white hover:text-gray-400 transition" onClick={() => handleNavigation("popular")}>Popular</button>
           <button className="text-white hover:text-gray-400 transition" onClick={() => handleNavigation("top-rated")}>Top Rated</button>
           <button className="text-white hover:text-gray-400 transition" onClick={() => handleNavigation("upcoming-movies")}>Upcoming</button>
+          <button className="text-white hover:text-gray-400 transition" onClick={() => navigate("/favorites")}>Favorites</button> {/* Added Favorites button */}
           {isLoggedIn ? (
             <div className="relative">
               <img

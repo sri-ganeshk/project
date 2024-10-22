@@ -9,6 +9,7 @@ import UpcomingMovies from './components/pages/UpcomingMovies';
 import Movie from './components/Movie';
 import Login from './components/Login';
 import Register from './components/register';
+import FavoritesDropdown from './components/FavoritesDropdown';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,6 +32,7 @@ function App() {
           <Route path='/movie/:id' element={<Movie />} />
           <Route path='/movies/popular' element={<Popular />} />
           <Route path='/movies/top-rated' element={<TopRatedMovies />} />
+          <Route path='/favorites' element={<FavoritesDropdown/>} />
           <Route path='/movies/upcoming-movies' element={<UpcomingMovies />} />
           {!isLoggedIn && (
             <>

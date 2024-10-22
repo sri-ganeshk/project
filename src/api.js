@@ -2,14 +2,14 @@ import axios from 'axios';
 
 // Set up the base URL for your backend
 const API = axios.create({
-    baseURL: 'https://glorious-space-umbrella-jvxqjx7ppg535w7j-5000.app.github.dev/',  // Ensure this points to your backend
+    baseURL: 'https://movie-review-omega-seven.vercel.app/api',  // Ensure this points to your backend
 });
 
 // Send the JWT token in requests if authenticated
 API.interceptors.request.use((req) => {
     const token = localStorage.getItem('token'); // Get token from localStorage (or however you store it)
     if (token) {
-        req.headers.Authorization = `${token}`;
+        req.headers.Authorization = `Bearer ${token}`; // Set token in the Authorization header
     }
     return req;
 }, (error) => {

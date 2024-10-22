@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { addFavoriteMovie } from '../api'; // Import the API call for adding to favorites
 
 const MovieCard = ({ movie }) => {
   const [movieDetails, setMovieDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isFavorite, setIsFavorite] = useState(false); // State to track favorite status
 
   useEffect(() => {
     const fetchMovieDetails = async () => {
@@ -27,6 +29,21 @@ const MovieCard = ({ movie }) => {
 
     fetchMovieDetails();
   }, [movie.id]);
+
+  const handleAddToFavorites = async () => {
+    try {
+      await addFavoriteMovie(movie.id);  // Send the request to add the movie to favorites
+      setIsFavorite(true); // Update favorite status after successful addition
+      alert('Movie added to favorites!');
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'Failed to add movie to favorites.';
+      if (errorMessage === 'Movie already in favorites') {
+        alert('This movie is already in your favorites!');
+      } else {
+        alert(errorMessage);
+      }
+    }
+  };
 
   if (loading) {
     return <div> </div>;
@@ -54,6 +71,25 @@ const MovieCard = ({ movie }) => {
           <h2 className="text-lg font-bold">{movie.title}</h2>
         </div>
       </Link>
+
+      {/* Favorite Button */}
+      <button
+        onClick={handleAddToFavorites}
+        className={`absolute top-2 left-2 text-white font-bold text-lg p-2 rounded-full ${isFavorite ? 'bg-red-500' : 'bg-gray-500'} hover:bg-red-600 transition duration-300`}
+      >
+        <svg
+          stroke="currentColor"
+          fill="currentColor"
+          strokeWidth="0"
+          viewBox="0 0 24 24"
+          height="1em"
+          width="1em"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M12 4.248c-3.148-5.402-12-3.735-12 2.944 0 4.713 5.373 7.431 12 15.048 6.627-7.617 12-10.335 12-15.048 0-6.679-8.852-8.346-12-2.944z"></path>
+        </svg>
+      </button>
+
       <div
         className={`absolute top-2 right-2 text-white font-bold text-sm w-8 h-8 flex justify-center items-center rounded-full ${ratingColor()}`}
       >
