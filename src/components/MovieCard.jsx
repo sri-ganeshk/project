@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { useUser, useClerk, useAuth } from '@clerk/clerk-react' ;
+import { useUser, useClerk } from '@clerk/clerk-react';
 
 const MovieCard = ({ movie }) => {
   const { user, updateUser } = useUser();
   const clerk = useClerk();
-  // Use useAuth to get token retrieval functionality
-  const { getToken } = useAuth();
 
   const [movieDetails, setMovieDetails] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -53,23 +51,17 @@ const MovieCard = ({ movie }) => {
     }
 
     try {
-      // Retrieve the token using useAuth's getToken function
-      const token = await getToken();
-      
-      const response = await axios.post(
-        '/api/favorites',
-        { movieId: movie.id },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      // Prepare payload with the movie id wrapped as an array and the user's unique Clerk id
+      const payload = {
+        movieId: [movie.id],
+        userId: user.id,
+      };
 
+      const response = await axios.post('/api/favorites', payload);
       setIsFavorite(true);
       alert(response.data.message);
     } catch (err) {
-      alert(err);
+      alert(err.response?.data?.message || 'Error adding favorite');
     }
   };
 
