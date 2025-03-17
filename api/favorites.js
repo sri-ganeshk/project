@@ -10,8 +10,7 @@ async function connectToDatabase() {
     return { client: cachedClient, db: cachedDb };
   }
 
-  const uri =
-    'mongodb+srv://1234:2498@cluster0.bdlu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+  const uri = 'mongodb+srv://1234:2498@cluster0.bdlu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
   const dbName = process.env.MONGODB_DB || 'yourDB';
 
   const client = await MongoClient.connect(uri, {
@@ -31,6 +30,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
+  // Log headers for debugging (remove in production)
+  console.log('Request headers:', req.headers);
+
   // Check for Authorization header and extract token
   const authHeader = req.headers.authorization;
   if (!authHeader) {
@@ -43,6 +45,7 @@ export default async function handler(req, res) {
     // Verify the token using your JWT secret
     decoded = jwt.verify(token, process.env.JWT_SECRET);
   } catch (err) {
+    console.error('JWT verification error:', err);
     return res.status(401).json({ message: 'Unauthorized: Invalid token' });
   }
 
