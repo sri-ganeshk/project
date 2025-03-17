@@ -3,21 +3,16 @@ import { MongoClient } from 'mongodb';
 let cachedClient = null;
 let cachedDb = null;
 
-// Function to connect to MongoDB with caching
 async function connectToDatabase() {
   if (cachedDb) {
     return { client: cachedClient, db: cachedDb };
   }
 
-  const uri =
-    'mongodb+srv://1234:2498@cluster0.bdlu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-  // Make sure to set this environment variable or update 'yourDB' to your actual DB name.
-  const dbName =  'yourDB';
+  const uri = 'mongodb+srv://1234:2498@cluster0.bdlu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+  const dbName = process.env.MONGODB_DB || 'yourDB';
 
-  const client = await MongoClient.connect(uri, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  // No options passed because the defaults in the latest driver are sufficient.
+  const client = await MongoClient.connect(uri);
   const db = client.db(dbName);
   cachedClient = client;
   cachedDb = db;
@@ -25,13 +20,11 @@ async function connectToDatabase() {
 }
 
 export default async function handler(req, res) {
-  // Only allow POST requests
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  // Expecting the request body to include movieId (an array) and userId
   const { movieId, userId } = req.body;
   if (!movieId || !Array.isArray(movieId)) {
     return res.status(400).json({ message: 'Missing or invalid movieId array' });
@@ -40,7 +33,6 @@ export default async function handler(req, res) {
     return res.status(400).json({ message: 'Missing userId' });
   }
 
-  // Connect to MongoDB
   let db;
   try {
     const connection = await connectToDatabase();
@@ -53,17 +45,17 @@ export default async function handler(req, res) {
   const favoritesCollection = db.collection('favorites');
 
   try {
-    // Check if a document for the user already exists
+    // Try to find an existing favorites document for the user.
     const userFavorites = await favoritesCollection.findOne({ userId });
     if (userFavorites) {
-      // Add new movie ids to the array without duplicates
+      // Use $addToSet with $each to add only new movie IDs (duplicates are ignored).
       const result = await favoritesCollection.updateOne(
         { userId },
         { $addToSet: { movies: { $each: movieId } } }
       );
       console.log('Update result:', result);
     } else {
-      // Insert a new document with the userId and movieId array
+      // If no document exists, create one.
       const result = await favoritesCollection.insertOne({
         userId,
         movies: movieId,
