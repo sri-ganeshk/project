@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useUser, useClerk, useAuth } from '@clerk/clerk-react' ;
 
 const MovieCard = ({ movie }) => {
-  // Destructure user and updateUser from useUser
   const { user, updateUser } = useUser();
   const clerk = useClerk();
+  // Use useAuth to get token retrieval functionality
+  const { getToken } = useAuth();
+
   const [movieDetails, setMovieDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isFavorite, setIsFavorite] = useState(false);
 
-  // Fetch movie details once when movie.id changes.
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
@@ -37,7 +38,6 @@ const MovieCard = ({ movie }) => {
     fetchMovieDetails();
   }, [movie.id]);
 
-  // Check and set favorite state based on user's public metadata.
   useEffect(() => {
     if (user && user.publicMetadata.favorites) {
       setIsFavorite(user.publicMetadata.favorites.includes(movie.id));
@@ -47,30 +47,29 @@ const MovieCard = ({ movie }) => {
   }, [user, movie.id]);
 
   const handleAddToFavorites = async () => {
-    // If the user is not signed in, trigger Clerk’s sign-in modal.
     if (!user) {
       clerk.openSignIn();
       return;
     }
 
     try {
-      const currentFavorites = user.publicMetadata.favorites || [];
-      if (currentFavorites.includes(movie.id)) {
-        alert('This movie is already in your favorites!');
-        return;
-      }
-
-      // Update public metadata using updateUser (client‑side)
-      await updateUser({
-        publicMetadata: {
-          favorites: [...currentFavorites, movie.id],
-        },
-      });
+      // Retrieve the token using useAuth's getToken function
+      const token = await getToken();
+      
+      const response = await axios.post(
+        '/api/favorites',
+        { movieId: movie.id },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setIsFavorite(true);
-      alert('Movie added to favorites!');
+      alert(response.data.message);
     } catch (err) {
-      alert('Failed to update favorites');
+      alert(err);
     }
   };
 
