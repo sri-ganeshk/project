@@ -1,24 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { addFavoriteMovie } from '../api'; // Import the API call for adding to favorites
+import { useUser, useClerk } from '@clerk/clerk-react';
 
 const MovieCard = ({ movie }) => {
+  // Destructure user and updateUser from useUser
+  const { user, updateUser } = useUser();
+  const clerk = useClerk();
   const [movieDetails, setMovieDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isFavorite, setIsFavorite] = useState(false); // State to track favorite status
+  const [isFavorite, setIsFavorite] = useState(false);
 
+  // Fetch movie details once when movie.id changes.
   useEffect(() => {
     const fetchMovieDetails = async () => {
       try {
         const apiKey = '1bf5ead9bb0ad708a1b4daa0e93f9b33';
-        const response = await axios.get(`https://api.themoviedb.org/3/movie/${movie.id}`, {
-          params: {
-            api_key: apiKey,
-            append_to_response: 'credits',
-          },
-        });
+        const response = await axios.get(
+          `https://api.themoviedb.org/3/movie/${movie.id}`,
+          {
+            params: {
+              api_key: apiKey,
+              append_to_response: 'credits',
+            },
+          }
+        );
         setMovieDetails(response.data);
         setLoading(false);
       } catch (err) {
@@ -30,23 +37,45 @@ const MovieCard = ({ movie }) => {
     fetchMovieDetails();
   }, [movie.id]);
 
+  // Check and set favorite state based on user's public metadata.
+  useEffect(() => {
+    if (user && user.publicMetadata.favorites) {
+      setIsFavorite(user.publicMetadata.favorites.includes(movie.id));
+    } else {
+      setIsFavorite(false);
+    }
+  }, [user, movie.id]);
+
   const handleAddToFavorites = async () => {
+    // If the user is not signed in, trigger Clerk’s sign-in modal.
+    if (!user) {
+      clerk.openSignIn();
+      return;
+    }
+
     try {
-      await addFavoriteMovie(movie.id);  // Send the request to add the movie to favorites
-      setIsFavorite(true); // Update favorite status after successful addition
+      const currentFavorites = user.publicMetadata.favorites || [];
+      if (currentFavorites.includes(movie.id)) {
+        alert('This movie is already in your favorites!');
+        return;
+      }
+
+      // Update public metadata using updateUser (client‑side)
+      await updateUser({
+        publicMetadata: {
+          favorites: [...currentFavorites, movie.id],
+        },
+      });
+
+      setIsFavorite(true);
       alert('Movie added to favorites!');
     } catch (err) {
-      const errorMessage = err.response?.data?.message || 'Failed to add movie to favorites.';
-      if (errorMessage === 'Movie already in favorites') {
-        alert('This movie is already in your favorites!');
-      } else {
-        alert(errorMessage);
-      }
+      alert('Failed to update favorites');
     }
   };
 
   if (loading) {
-    return <div> </div>;
+    return <div>Loading...</div>;
   }
 
   if (error) {
@@ -75,7 +104,9 @@ const MovieCard = ({ movie }) => {
       {/* Favorite Button */}
       <button
         onClick={handleAddToFavorites}
-        className={`absolute top-2 left-2 text-white font-bold text-lg p-2 rounded-full ${isFavorite ? 'bg-red-500' : 'bg-gray-500'} hover:bg-red-600 transition duration-300`}
+        className={`absolute top-2 left-2 text-white font-bold text-lg p-2 rounded-full ${
+          isFavorite ? 'bg-red-500' : 'bg-gray-500'
+        } hover:bg-red-600 transition duration-300`}
       >
         <svg
           stroke="currentColor"

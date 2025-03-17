@@ -46,7 +46,7 @@ const PopularMovies = () => {
   }, [page]);
 
   return (
-    <div className="p-6">
+    <div className="px-6 py-20">
       <h1 className="text-3xl md:text-5xl font-bold text-center text-white mb-8">
         Popular Movies
       </h1>

@@ -88,7 +88,7 @@ const Movie = () => {
   };
 
   return (
-    <div className="md:ml-0">
+    <div className="md:ml-0 py-20">
       <div className="relative h-auto md:h-[82vh] flex justify-center">
         <div className="h-full w-full shadowbackdrop absolute"></div>
         <h1 className="text-white absolute bottom-0 p-10 text-2xl md:text-6xl font-bold text-center">
