@@ -11,7 +11,7 @@ async function connectToDatabase() {
     return { client: cachedClient, db: cachedDb };
   }
 
-  const uri = process.env.MONGODB_URI;
+  const uri ='mongodb+srv://1234:2498@cluster0.bdlu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
   const dbName = process.env.MONGODB_DB || 'yourDB';
 
   const client = await MongoClient.connect(uri, {

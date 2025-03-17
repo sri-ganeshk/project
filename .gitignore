@@ -25,5 +25,8 @@ dist-ssr
 *.sw?
 
 
+api/.env
+
+
 
 
