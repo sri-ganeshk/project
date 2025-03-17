@@ -1,6 +1,5 @@
-// api/favorites.js
-const { MongoClient } = require('mongodb');
-const jwt = require('jsonwebtoken');
+import { MongoClient } from 'mongodb';
+import jwt from 'jsonwebtoken';
 
 let cachedClient = null;
 let cachedDb = null;
@@ -11,7 +10,8 @@ async function connectToDatabase() {
     return { client: cachedClient, db: cachedDb };
   }
 
-  const uri ='mongodb+srv://1234:2498@cluster0.bdlu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+  const uri =
+    'mongodb+srv://1234:2498@cluster0.bdlu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
   const dbName = process.env.MONGODB_DB || 'yourDB';
 
   const client = await MongoClient.connect(uri, {
@@ -24,7 +24,7 @@ async function connectToDatabase() {
   return { client, db };
 }
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // Only allow POST requests
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -88,4 +88,4 @@ module.exports = async (req, res) => {
     console.error('Error updating favorites:', err);
     res.status(500).json({ message: 'Server error' });
   }
-};
+}
