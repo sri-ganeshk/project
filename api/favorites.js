@@ -1,5 +1,4 @@
 import { MongoClient } from 'mongodb';
-import jwt from 'jsonwebtoken';
 
 let cachedClient = null;
 let cachedDb = null;
@@ -30,30 +29,16 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  // Log headers for debugging (remove in production)
-  console.log('Request headers:', req.headers);
-
-  // Check for Authorization header and extract token
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ message: 'Unauthorized: No token provided' });
+  // Expecting the request body to include movieId (an array) and userId
+  const { movieId, userId } = req.body;
+  
+  // Validate that movieId is an array and userId is provided
+  if (!movieId || !Array.isArray(movieId)) {
+    return res.status(400).json({ message: 'Missing or invalid movieId array' });
   }
-  const token = authHeader.split(' ')[1];
-
-  let decoded;
-  try {
-    // Verify the token using your JWT secret
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (err) {
-    console.error('JWT verification error:', err);
-    return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+  if (!userId) {
+    return res.status(400).json({ message: 'Missing userId' });
   }
-
-  const { movieId } = req.body;
-  if (!movieId) {
-    return res.status(400).json({ message: 'Missing movieId' });
-  }
-  const userId = decoded.id; // Ensure your token contains the user id in "id"
 
   // Connect to MongoDB
   let db;
@@ -71,22 +56,19 @@ export default async function handler(req, res) {
     // Check if the user already exists in the collection
     const userFavorites = await favoritesCollection.findOne({ userId });
     if (userFavorites) {
-      // Prevent duplicate entries
-      if (userFavorites.movies.includes(movieId)) {
-        return res.status(400).json({ message: 'Movie already favorited' });
-      }
+      // Add movie ids to the array, ensuring no duplicates
       await favoritesCollection.updateOne(
         { userId },
-        { $push: { movies: movieId } }
+        { $addToSet: { movies: { $each: movieId } } }
       );
     } else {
       // Create a new record for the user
       await favoritesCollection.insertOne({
         userId,
-        movies: [movieId],
+        movies: movieId,
       });
     }
-    res.status(200).json({ message: 'Movie added to favorites' });
+    res.status(200).json({ message: 'Movies added to favorites' });
   } catch (err) {
     console.error('Error updating favorites:', err);
     res.status(500).json({ message: 'Server error' });
