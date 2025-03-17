@@ -10,6 +10,7 @@ const MovieCard = ({ movie }) => {
   const [movieDetails, setMovieDetails] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // State to track if the movie is favorited
   const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
@@ -26,9 +27,9 @@ const MovieCard = ({ movie }) => {
           }
         );
         setMovieDetails(response.data);
-        setLoading(false);
       } catch (err) {
         setError(err);
+      } finally {
         setLoading(false);
       }
     };
@@ -36,6 +37,7 @@ const MovieCard = ({ movie }) => {
     fetchMovieDetails();
   }, [movie.id]);
 
+  // Check if the movie is in the user's favorites on render/update
   useEffect(() => {
     if (user && user.publicMetadata.favorites) {
       setIsFavorite(user.publicMetadata.favorites.includes(movie.id));
@@ -49,29 +51,39 @@ const MovieCard = ({ movie }) => {
       clerk.openSignIn();
       return;
     }
-
     try {
-      // Prepare payload with the movie id wrapped as an array and the user's unique Clerk id
+      // Payload with the movie id in an array and the user's Clerk id
       const payload = {
         movieId: [movie.id],
         userId: user.id,
       };
-
       const response = await axios.post('/api/favorites', payload);
+      
+      // Update local state to mark as favorite
       setIsFavorite(true);
+      
+      // Optionally, update Clerk's public metadata so the user's data stays in sync.
+      // This assumes that your Clerk integration permits updating public metadata.
+      // Here we append the movie id to the favorites array.
+      await updateUser({
+        publicMetadata: {
+          favorites: [...(user.publicMetadata.favorites || []), movie.id],
+        },
+      });
+      
       alert(response.data.message);
     } catch (err) {
       alert(err.response?.data?.message || 'Error adding favorite');
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error fetching movie details</div>;
 
-  if (error) {
-    return <div>Error fetching movie details</div>;
-  }
+  // Set button style: if isFavorite is true, show as favorited (e.g., red background)
+  const favoriteButtonClass = isFavorite
+    ? 'bg-red-500'
+    : 'bg-gray-500';
 
   const ratingColor = () => {
     if (movieDetails.vote_average >= 7) return 'bg-green-600';
@@ -95,9 +107,7 @@ const MovieCard = ({ movie }) => {
       {/* Favorite Button */}
       <button
         onClick={handleAddToFavorites}
-        className={`absolute top-2 left-2 text-white font-bold text-lg p-2 rounded-full ${
-          isFavorite ? 'bg-red-500' : 'bg-gray-500'
-        } hover:bg-red-600 transition duration-300`}
+        className={`absolute top-2 left-2 text-white font-bold text-lg p-2 rounded-full ${favoriteButtonClass} hover:bg-red-600 transition duration-300`}
       >
         <svg
           stroke="currentColor"
@@ -112,9 +122,7 @@ const MovieCard = ({ movie }) => {
         </svg>
       </button>
 
-      <div
-        className={`absolute top-2 right-2 text-white font-bold text-sm w-8 h-8 flex justify-center items-center rounded-full ${ratingColor()}`}
-      >
+      <div className={`absolute top-2 right-2 text-white font-bold text-sm w-8 h-8 flex justify-center items-center rounded-full ${ratingColor()}`}>
         {movieDetails.vote_average.toFixed(1)}
       </div>
     </div>
