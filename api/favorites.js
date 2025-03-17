@@ -9,8 +9,10 @@ async function connectToDatabase() {
     return { client: cachedClient, db: cachedDb };
   }
 
-  const uri = 'mongodb+srv://1234:2498@cluster0.bdlu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-  const dbName = process.env.MONGODB_DB || 'yourDB';
+  const uri =
+    'mongodb+srv://1234:2498@cluster0.bdlu1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+  // Make sure to set this environment variable or update 'yourDB' to your actual DB name.
+  const dbName =  'yourDB';
 
   const client = await MongoClient.connect(uri, {
     useNewUrlParser: true,
@@ -31,8 +33,6 @@ export default async function handler(req, res) {
 
   // Expecting the request body to include movieId (an array) and userId
   const { movieId, userId } = req.body;
-  
-  // Validate that movieId is an array and userId is provided
   if (!movieId || !Array.isArray(movieId)) {
     return res.status(400).json({ message: 'Missing or invalid movieId array' });
   }
@@ -53,24 +53,26 @@ export default async function handler(req, res) {
   const favoritesCollection = db.collection('favorites');
 
   try {
-    // Check if the user already exists in the collection
+    // Check if a document for the user already exists
     const userFavorites = await favoritesCollection.findOne({ userId });
     if (userFavorites) {
-      // Add movie ids to the array, ensuring no duplicates
-      await favoritesCollection.updateOne(
+      // Add new movie ids to the array without duplicates
+      const result = await favoritesCollection.updateOne(
         { userId },
         { $addToSet: { movies: { $each: movieId } } }
       );
+      console.log('Update result:', result);
     } else {
-      // Create a new record for the user
-      await favoritesCollection.insertOne({
+      // Insert a new document with the userId and movieId array
+      const result = await favoritesCollection.insertOne({
         userId,
         movies: movieId,
       });
+      console.log('Insert result:', result);
     }
-    res.status(200).json({ message: 'Movies added to favorites' });
+    return res.status(200).json({ message: 'Movies added to favorites' });
   } catch (err) {
     console.error('Error updating favorites:', err);
-    res.status(500).json({ message: 'Server error' });
+    return res.status(500).json({ message: 'Server error' });
   }
 }
